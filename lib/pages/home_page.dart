@@ -77,14 +77,21 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         actions: [
-          IconButton(
-            onPressed: signUserOut,
-            icon: Icon(Icons.logout),
-          ),
-          Text(
-            "Hello $displayName",
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
+          Row(
+            children: [
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                child: Text(
+                  "Hey ${displayName}!",
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+              IconButton(
+                onPressed: signUserOut,
+                icon: Icon(Icons.logout),
+              ),
+            ],
+          )
         ],
       ),
       body: Column(
@@ -94,9 +101,10 @@ class _HomePageState extends State<HomePage> {
             alignment: Alignment.center,
             child: Text(
               'My Recipes',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
           ),
+            SizedBox(height: 25),
           if (recipes.isNotEmpty)
             Expanded(
                 child: ListView.builder(
