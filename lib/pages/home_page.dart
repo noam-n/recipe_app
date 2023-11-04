@@ -8,6 +8,7 @@ import 'package:recipe_app/models/recipe.dart';
 import 'package:recipe_app/models/recipe_repository.dart';
 import '../components/recipe_card.dart';
 import 'add_recipe.dart';
+import 'recipe_details.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -65,10 +66,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void deleteRecipeFromList(Recipe recipe) {
-  setState(() {
-    recipes.remove(recipe);
-  });
-}
+    setState(() {
+      recipes.remove(recipe);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,18 +99,28 @@ class _HomePageState extends State<HomePage> {
           ),
           if (recipes.isNotEmpty)
             Expanded(
-              child: ListView.builder(
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return RecipeCard( // use the recipe card component
+                child: ListView.builder(
+              itemCount: recipes.length,
+              itemBuilder: (context, index) {
+                final recipe = recipes[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecipeDetailsPage(recipe),
+                      ),
+                    );
+                  },
+                  child: RecipeCard(
                     recipe: recipe,
                     recipeList: recipes,
-                    onDelete: deleteRecipeFromList, // Pass the callback function
-                  );
-                },
-              ),
-            )
+                    onDelete:
+                        deleteRecipeFromList, // Pass the callback function
+                  ),
+                );
+              },
+            ))
           else
             Center(
               child: Text('No recipes available.'),
