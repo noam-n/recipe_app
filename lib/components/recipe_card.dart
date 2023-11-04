@@ -55,46 +55,69 @@ class _RecipeCardState extends State<RecipeCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 5, // Add elevation for a shadow effect
-      margin: EdgeInsets.fromLTRB(50,15,50,15), // Add margin for spacing between cards
+      elevation: 15, // Add elevation for a shadow effect
+      margin: EdgeInsets.fromLTRB(
+          60, 20, 60, 20), // Add margin for spacing between cards
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12), // Apply rounded corners
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Display the recipe image if available
-           recipeImage()!,
-          ListTile(
-            title: Text(
-              widget.recipe.recipeName,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
+          //recipeImage()!,
+
+          // First section: Left to Mid (Recipe Name, Making Time, Difficulty)
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(children: [
-                  Icon(Icons.watch_later),
-                  Text(' ${widget.recipe.makingTime}'),
-                ]),
-                Row(children: [
-                  Icon(Icons.hardware),
-                  Text(' ${widget.recipe.difficulty}'),
-                  Spacer(),
-                  // Add a trash icon button
-                  IconButton(
-                    color: Colors.redAccent,
-                    alignment: Alignment.bottomRight,
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      // Call the deleteRecipe method to remove the recipe from Firestore
-                      deleteRecipe(widget.recipe.id!);
-                    },
-                  ),
-                ]),
-                //Text('Ingredients: ${widget.recipe.ingredients}'),
-                //Text('Instructions: ${widget.recipe.instructions}'),
+                Text(
+                  widget.recipe.recipeName,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.watch_later),
+                    Text(' ${widget.recipe.makingTime}'),
+
+                    SizedBox(width: 25),
+
+                    Icon(Icons.hardware),
+                    Text(' ${widget.recipe.difficulty}'),
+                  ],
+                ),
               ],
             ),
+          ),
+
+          // Second section: Mid to Right (Image and Delete Button)
+          Stack(
+            alignment: AlignmentDirectional.bottomEnd,
+            children: [
+              // Display the recipe image if available
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(widget.recipe.imageURL),
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              // Delete button
+              IconButton(
+                color: Colors.redAccent,
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  // Call the deleteRecipe method to remove the recipe from Firestore
+                  deleteRecipe(widget.recipe.id!);
+                },
+              ),
+            ],
           ),
         ],
       ),
