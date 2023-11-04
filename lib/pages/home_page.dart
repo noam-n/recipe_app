@@ -74,6 +74,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.black,
         actions: [
           IconButton(
             onPressed: signUserOut,
@@ -116,6 +117,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
         onPressed: () => navigateToAddRecipePage(context),
         child: Icon(Icons.add),
       ),

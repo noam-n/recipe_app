@@ -24,56 +24,75 @@ class _RecipeCardState extends State<RecipeCard> {
 
     collectionRef.doc(recipeId).delete().then((value) {
       // Remove the deleted recipe from the list
-      widget.onDelete(widget.recipe); // Call the callback to update the list in HomePage
+      widget.onDelete(
+          widget.recipe); // Call the callback to update the list in HomePage
     }).catchError((error) {
       // Handle any potential error during deletion
       print('Error deleting recipe: $error');
     });
   }
 
+  Widget? recipeImage() {
+    if (widget.recipe.imageURL.isNotEmpty && widget.recipe.imageURL != 'null') {
+      return Image.network(
+        widget.recipe.imageURL,
+        height: 150, // set height and width as needed
+        width: double.infinity,
+        fit: BoxFit.contain,
+      );
+    } // Check if imageURL is not empty
+    else {
+      return Container(
+        height: 150, // set height and width as needed
+        color:
+            Colors.grey, // You can use a different color or placeholder image
+        alignment: Alignment.center,
+        child: Text('No Image Available'),
+      );
+    } // Handle the case when imageURL is empty or null
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3, // Add elevation for a shadow effect
-      margin: EdgeInsets.all(10), // Add margin for spacing between cards
+      elevation: 5, // Add elevation for a shadow effect
+      margin: EdgeInsets.fromLTRB(50,15,50,15), // Add margin for spacing between cards
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Apply rounded corners
+      ),
       child: Column(
         children: [
           // Display the recipe image if available
-          if (widget.recipe.imageURL.isNotEmpty &&
-              widget.recipe.imageURL !=
-                  'null') // Check if imageURL is not empty
-            Image.network(
-              widget.recipe.imageURL,
-              height: 150, // set height and width as needed
-              width: double.infinity,
-              fit: BoxFit.contain,
-            )
-          else // Handle the case when imageURL is empty or null
-            Container(
-              height: 150, // set height and width as needed
-              color: Colors
-                  .grey, // You can use a different color or placeholder image
-              alignment: Alignment.center,
-              child: Text('No Image Available'),
-            ),
+           recipeImage()!,
           ListTile(
-            title: Text(widget.recipe.recipeName),
+            title: Text(
+              widget.recipe.recipeName,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Making Time: ${widget.recipe.makingTime}'),
-                Text('Difficulty: ${widget.recipe.difficulty}'),
-                Text('Ingredients: ${widget.recipe.ingredients}'),
-                Text('Instructions: ${widget.recipe.instructions}'),
-
-                // Add a trash icon button
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    // Call the deleteRecipe method to remove the recipe from Firestore
-                    deleteRecipe(widget.recipe.id!);
-                  },
-                ),
+                Row(children: [
+                  Icon(Icons.watch_later),
+                  Text(' ${widget.recipe.makingTime}'),
+                ]),
+                Row(children: [
+                  Icon(Icons.hardware),
+                  Text(' ${widget.recipe.difficulty}'),
+                  Spacer(),
+                  // Add a trash icon button
+                  IconButton(
+                    color: Colors.redAccent,
+                    alignment: Alignment.bottomRight,
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      // Call the deleteRecipe method to remove the recipe from Firestore
+                      deleteRecipe(widget.recipe.id!);
+                    },
+                  ),
+                ]),
+                //Text('Ingredients: ${widget.recipe.ingredients}'),
+                //Text('Instructions: ${widget.recipe.instructions}'),
               ],
             ),
           ),
