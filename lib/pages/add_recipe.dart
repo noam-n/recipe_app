@@ -51,9 +51,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
   final _imagePicker = ImagePicker();
   XFile? _selectedImage; // Store the selected image file
 
-  String _imageURL = '';
-  bool _hasImage =
-      false; // Class variable to check if an image has been selected
+  bool _hasImage = false; // Class variable to check if an image has been selected
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
