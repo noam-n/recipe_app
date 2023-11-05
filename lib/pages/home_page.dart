@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+//import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/models/recipe.dart';
 import 'package:recipe_app/models/recipe_repository.dart';
+import 'package:recipe_app/pages/explore_page.dart';
+import '../components/bottom_navbar.dart';
 import '../components/recipe_card.dart';
 import 'add_recipe.dart';
 import 'recipe_details.dart';
@@ -21,8 +23,29 @@ class _HomePageState extends State<HomePage> {
   var user = FirebaseAuth.instance.currentUser!;
   var displayName = "Guest";
   List<Recipe> recipes = [];
-
   String searchQuery = '';
+
+  void navigateToExplore(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return ExplorePage();
+        },
+      ),
+    );
+  }
+
+  void navigateToHome(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return HomePage();
+        },
+      ),
+    );
+  }
 
   void updateSearchQuery(String query) {
     setState(() {
@@ -228,6 +251,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () => navigateToAddRecipePage(context),
         child: Icon(Icons.add),
       ),
+      bottomNavigationBar: MyBottomNavbar(),
     );
   }
 }
