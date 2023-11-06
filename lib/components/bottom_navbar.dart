@@ -6,7 +6,9 @@ import '../pages/explore_page.dart';
 import '../pages/home_page.dart';
 
 class MyBottomNavbar extends StatelessWidget {
-  const MyBottomNavbar({super.key});
+  final bool isRecipeDetailsPage; // Add a flag to indicate if it's the Recipe Details page
+
+  const MyBottomNavbar({super.key, required this.isRecipeDetailsPage});
 
   void navigateToExplore(BuildContext context) {
     Navigator.push(
@@ -43,8 +45,8 @@ class MyBottomNavbar extends StatelessWidget {
             label: 'Explore',
           ),
         ],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: isRecipeDetailsPage? Colors.grey : Colors.white,
+        unselectedItemColor: Colors.grey, // Set color based on the current page,
         backgroundColor: Colors.black,
         onTap: (int index) {
           if (index == 0) {

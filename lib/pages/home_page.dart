@@ -8,6 +8,7 @@ import 'package:recipe_app/models/recipe.dart';
 import 'package:recipe_app/models/recipe_repository.dart';
 import 'package:recipe_app/pages/explore_page.dart';
 import '../components/bottom_navbar.dart';
+import '../components/my_AppBar.dart';
 import '../components/recipe_card.dart';
 import 'add_recipe.dart';
 import 'recipe_details.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   var displayName = "Guest";
   List<Recipe> recipes = [];
   String searchQuery = '';
+  bool isNeedSearchfeild = true;
 
   void navigateToExplore(BuildContext context) {
     Navigator.push(
@@ -122,7 +124,10 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RecipeDetailsPage(recipe),
+                    builder: (context) => RecipeDetailsPage(
+                      recipe: recipe,
+                      isNeedSearchfeild: true,
+                    ),
                   ),
                 );
               },
@@ -154,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RecipeDetailsPage(recipe),
+                    builder: (context) => RecipeDetailsPage(recipe: recipe, isNeedSearchfeild: isNeedSearchfeild),
                   ),
                 );
               },
@@ -180,55 +185,9 @@ class _HomePageState extends State<HomePage> {
         searchQuery.isEmpty ? recipes : getFilteredRecipes();
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        actions: [
-          // Search bar
-          Align(
-            alignment: Alignment.center,
-            child: Row(
-              children: [
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.only(right: 20), // Add right margin
-                    child: SizedBox(
-                      width: 200, // Set a width to limit the search bar
-                      child: TextField(
-                        onChanged: updateSearchQuery,
-                        decoration: InputDecoration(
-                          hintText: 'Search recipes...',
-                          filled: true,
-                          fillColor: Colors.grey,
-                          contentPadding: EdgeInsets.all(10), // Adjust padding
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(
-                                20), // Add rounded corners
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                // "Hello displayName" text wrapped in Align widget
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    margin: EdgeInsets.only(left: 20, right: 20),
-                    child: Text(
-                      "Hey ${displayName}!",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: signUserOut,
-                  icon: Icon(Icons.logout),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      appBar: MyAppBar(
+          onSearchChanged: updateSearchQuery,
+          isNeedSearchfeild: isNeedSearchfeild),
       body: Column(
         children: [
           SizedBox(height: 25),
@@ -251,7 +210,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: () => navigateToAddRecipePage(context),
         child: Icon(Icons.add),
       ),
-      bottomNavigationBar: MyBottomNavbar(),
+      bottomNavigationBar: MyBottomNavbar(isRecipeDetailsPage: false),
     );
   }
 }
