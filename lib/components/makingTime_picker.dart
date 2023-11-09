@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class MakingTimePicker extends StatefulWidget {
   final Function(String) onTimeSelected;
-  
-  MakingTimePicker({required this.onTimeSelected});
+  final String initialValue;
+
+  MakingTimePicker({required this.onTimeSelected, required this.initialValue});
 
   @override
   _MakingTimePickerState createState() => _MakingTimePickerState();
@@ -26,6 +27,12 @@ class _MakingTimePickerState extends State<MakingTimePicker> {
     '1.5 hours',
     '2 hours+',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    selectedTime = widget.initialValue;
+  }
 
   @override
   Widget build(BuildContext context) {

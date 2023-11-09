@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipe_app/components/my_appBar.dart';
 import 'package:recipe_app/models/recipe.dart';
-
 import '../components/bottom_navbar.dart';
 
 class RecipeDetailsPage extends StatefulWidget {
@@ -24,93 +23,96 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     });
   }
 
-  Widget displayInstructions() {
-    final instructionsList = widget.recipe.instructions.split('\n');
-
-    // Create a list of widgets for the instructions
-    List<Widget> instructionWidgets = [];
-
-    instructionWidgets.add(SizedBox(height: 25));
-    instructionWidgets.add(Text(
-      'Instructions',
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-    ));
-    instructionWidgets.add(SizedBox(height: 10));
-
-    for (int i = 0; i < instructionsList.length; i++) {
-      final step = instructionsList[i];
-      instructionWidgets.add(ListTile(
-        leading: CircleAvatar(
-          child: Text((i + 1).toString()), // Display step number
-        ),
-        title: Text(step),
-      ));
-    }
-
-    // Return a Column containing the list of instruction widgets
-    return Column(children: instructionWidgets);
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<String> ingredientsList = widget.recipe.ingredients.split(' ');
-    //final instructionsList = widget.recipe.instructions.split('\n');
-
     return Scaffold(
       appBar: MyAppBar(
           onSearchChanged: updateSearchQuery, isNeedSearchfeild: false),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            height: 25,
-          ),
-          Center(
-            child: Text(
-              widget.recipe.recipeName, //displaying recipe name as title
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 25,
             ),
-          ),
-          SizedBox(
-            height: 25,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.watch_later),
-              Text(' ${widget.recipe.makingTime}'),
-              SizedBox(width: 25),
-              Icon(Icons.hardware),
-              Text(' ${widget.recipe.difficulty}'),
-            ],
-          ),
-          SizedBox(
-            height: 25,
-          ),
-          Container(
-            height: 300,
-            width: 500,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(widget.recipe.imageURL),
-                fit: BoxFit.contain,
+            Center(
+              child: Text(
+                widget.recipe.recipeName, //displaying recipe name as title
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-          ),
-          // Display Ingredients
-          SizedBox(height: 25),
-          Text(
-            'Ingredients',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          for (final ingredient in ingredientsList)
-            ListTile(
-              leading: Icon(Icons.add),
-              title: Text(ingredient),
+            SizedBox(
+              height: 25,
             ),
-          displayInstructions(),
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.watch_later),
+                Text(' ${widget.recipe.makingTime}'),
+                SizedBox(width: 25),
+                Icon(Icons.hardware),
+                Text(' ${widget.recipe.difficulty}'),
+              ],
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            Container(
+              height: 300,
+              width: 500,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(widget.recipe.imageURL),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            // Display Ingredients
+            SizedBox(height: 25),
+
+            Align(
+              alignment: Alignment
+                  .centerLeft, // Align the following widgets to the left
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal:
+                        MediaQuery.of(context).size.width >= 600 ? 60.0 : 30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 25),
+                    Text(
+                      'Ingredients',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      widget.recipe
+                          .ingredients, // Display ingredients as multi-line text
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(height: 35),
+
+                    // Display instructions
+                    Text(
+                      'Making Instructions',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      widget.recipe
+                          .instructions, // Display ingredients as multi-line text
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
       bottomNavigationBar: MyBottomNavbar(isRecipeDetailsPage: true),
     );

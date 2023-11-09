@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class DifficultyDropdown extends StatefulWidget {
   final Function(String) onDifficultySelected;
+    final String initialValue;
 
-  DifficultyDropdown({required this.onDifficultySelected});
+  DifficultyDropdown({required this.onDifficultySelected, required this.initialValue});
 
   @override
   _DifficultyDropdownState createState() => _DifficultyDropdownState();
@@ -13,6 +14,12 @@ class _DifficultyDropdownState extends State<DifficultyDropdown> {
   String selectedDifficulty = 'Not Specified'; // Default selected difficulty
 
   final List<String> difficultyOptions = ['Not Specified','Beginner', 'Intermediate', 'Expert'];
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDifficulty = widget.initialValue;
+  }
 
   @override
   Widget build(BuildContext context) {
