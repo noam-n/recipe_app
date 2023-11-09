@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/models/recipe.dart';
 
+import '../pages/edit_recipe.dart';
+
 class RecipeCard extends StatefulWidget {
   final Recipe recipe;
   final List<Recipe> recipeList; // This is the list of recipes
@@ -52,6 +54,37 @@ class _RecipeCardState extends State<RecipeCard> {
     } // Handle the case when imageURL is empty or null
   }
 
+  void deleteRecipeConfirmation(BuildContext context, String recipeId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Recipe'),
+          content: Text(
+              'Are you sure you want to delete ${widget.recipe.recipeName}?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                deleteRecipe(recipeId); // Call the deleteRecipe method
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -83,9 +116,7 @@ class _RecipeCardState extends State<RecipeCard> {
                   children: [
                     Icon(Icons.watch_later),
                     Text(' ${widget.recipe.makingTime}'),
-
                     SizedBox(width: 25),
-
                     Icon(Icons.hardware),
                     Text(' ${widget.recipe.difficulty}'),
                   ],
@@ -114,8 +145,18 @@ class _RecipeCardState extends State<RecipeCard> {
                 icon: Icon(Icons.delete),
                 onPressed: () {
                   // Call the deleteRecipe method to remove the recipe from Firestore
-                  deleteRecipe(widget.recipe.id!);
+                  deleteRecipeConfirmation(context, widget.recipe.id!);
                 },
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  color: Colors.grey,
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    navigateToEditPage(context, widget.recipe);
+                  },
+                ),
               ),
             ],
           ),
@@ -123,4 +164,14 @@ class _RecipeCardState extends State<RecipeCard> {
       ),
     );
   }
+}
+
+void navigateToEditPage(BuildContext context, Recipe recipe) {
+  // Navigate to the EditRecipePage
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => EditRecipe(recipe: recipe),
+    ),
+  );
 }

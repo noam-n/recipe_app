@@ -1,32 +1,51 @@
-// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, use_key_in_widget_constructors, prefer_const_constructors_in_immutables
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:recipe_app/components/textFeild.dart';
-import 'package:recipe_app/components/button.dart';
-import 'package:image_picker/image_picker.dart';
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../components/bottom_navbar.dart';
+import '../components/button.dart';
 import '../components/difficulty_dropdown.dart';
 import '../components/makingTime_Picker.dart';
+import '../models/recipe.dart';
 import 'home_page.dart';
 
-class AddRecipePage extends StatefulWidget {
-  final Function() onRecipeAdded; // Callback function to notify HomePage
-  AddRecipePage({required this.onRecipeAdded});
+class EditRecipe extends StatefulWidget {
+  final Recipe recipe;
+  const EditRecipe({super.key, required this.recipe});
 
   @override
-  State<AddRecipePage> createState() => _AddRecipePageState();
+  State<EditRecipe> createState() => _EditRecipeState();
 }
 
-class _AddRecipePageState extends State<AddRecipePage> {
+class _EditRecipeState extends State<EditRecipe> {
+  late TextEditingController recipeNameController;
+  late TextEditingController ingredientsController;
+  late TextEditingController instructionsController;
+
+  final _imagePicker = ImagePicker();
+  XFile? _selectedImage; // Store the selected image file
+  bool _hasImage =
+      false; // Class variable to check if an image has been selected
   String selectedTime = 'Not Specified'; // Initialize with a default time
   String difficulty = 'Not Specified';
 
-  // Initialize with a default difficulty
+  void navigateToHome(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return HomePage();
+        },
+      ),
+    );
+  }
+
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
+
   void handleTimeSelection(String time) {
     setState(() {
       selectedTime = time;
@@ -38,24 +57,6 @@ class _AddRecipePageState extends State<AddRecipePage> {
       difficulty = _difficulty;
     });
   }
-
-  final recipeNameController = TextEditingController();
-
-  final ingredientsController = TextEditingController();
-
-  final instructionsController = TextEditingController();
-
-  final makingTimeController = TextEditingController();
-
-  final difficultyController = TextEditingController();
-
-  final _imagePicker = ImagePicker();
-  XFile? _selectedImage; // Store the selected image file
-
-  bool _hasImage =
-      false; // Class variable to check if an image has been selected
-
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   void _pickImage() async {
     final XFile? pickedImage =
@@ -69,104 +70,17 @@ class _AddRecipePageState extends State<AddRecipePage> {
     }
   }
 
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
-  void navigateToHome(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return HomePage();
-        },
-      ),
-    );
-  }
-
-  void addRecipeToDB() async {
-    //write the logic to add the recipe to the database
-    final recipeName = recipeNameController.text;
-    final ingredients = ingredientsController.text;
-    final instructions = instructionsController.text;
-    final makingTime = selectedTime;
-    final difficulty = this.difficulty;
-    String imageURL =
-        _hasImage ? _selectedImage!.path : 'assets/images/DefaultImage.png';
-    // Upload the image to Firebase Storage and get the URL
-
-    if (_selectedImage != null) {
-      final imageFile = File(_selectedImage!.path);
-      imageURL = await uploadImageToStorage(imageFile);
-      // Now we can use the 'imageFile' to work with the selected image.
+  bool isFormValidated(String recipeName, String ingredients,
+      String instructions, String makingTime, String difficulty) {
+    // check if the filled form is valid, correct values etc.
+    if (recipeName.isEmpty ||
+        ingredients.isEmpty ||
+        instructions.isEmpty ||
+        makingTime.isEmpty ||
+        difficulty.isEmpty) {
+      return false;
     }
-
-    // Create a map representing the recipe data
-    final recipeData = {
-      'name': recipeName,
-      'ingredients': ingredients,
-      'instructions': instructions,
-      'makingTime': makingTime,
-      'difficulty': difficulty,
-      'imageURL': imageURL,
-      'userId': FirebaseAuth.instance.currentUser?.uid, // Set the user's ID
-    };
-
-    // Add the recipe data to the "recipes" collection
-    _firestore.collection('recipes').add(recipeData).then((docRef) {
-      // Recipe has been added, you can use docRef.id if needed.
-      print('Recipe added with ID: ${docRef.id}');
-      print("User: ${FirebaseAuth.instance.currentUser?.uid}");
-      print("Display Name: ${FirebaseAuth.instance.currentUser?.displayName}");
-    }).catchError((error) {
-      // Handle the error if the recipe couldn't be added.
-      print('Error adding recipe: $error');
-    });
-  }
-
-  Future<String> uploadImageToStorage(File imageFile) async {
-    try {
-      final storage = FirebaseStorage.instance;
-      final Reference storageReference = storage
-          .ref()
-          .child('recipe_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-
-      UploadTask uploadTask = storageReference.putFile(imageFile);
-
-      await uploadTask.whenComplete(() => null);
-      final imageUrl = await storageReference.getDownloadURL();
-      return imageUrl;
-    } catch (e) {
-      print('Error uploading image: $e');
-      return 'null'; // Return null to handle errors
-    }
-  }
-
-  void failedToAddRecipe(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.red,
-          title: Text(
-            'Adding Recipe Failed, Check for missing feilds.',
-            style: TextStyle(color: Colors.white),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'OK',
-                style: TextStyle(
-                    color: Colors.white), // Set button text color to white
-              ),
-            ),
-          ],
-        );
-      },
-    );
+    return true;
   }
 
   void recipeAddedSuccesfully(BuildContext context) {
@@ -196,30 +110,92 @@ class _AddRecipePageState extends State<AddRecipePage> {
         });
   }
 
-  bool isFormValidated(String recipeName, String ingredients,
-      String instructions, String makingTime, String difficulty) {
-    // check if the filled form is valid, correct values etc.
-    if (recipeName.isEmpty ||
-        ingredients.isEmpty ||
-        instructions.isEmpty ||
-        makingTime.isEmpty ||
-        difficulty.isEmpty) {
-      return false;
-    }
-    return true;
+  void failedToAddRecipe(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red,
+          title: Text(
+            'Editing Recipe Failed, Check for missing feilds.',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(
+                    color: Colors.white), // Set button text color to white
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void addRecipe(String recipeName, String ingredients, String instructions,
-      String makingTime, String difficulty) {
+  void finishEditRecipe(String updatedRecipeName, String updatedIngredients,
+      String updatedInstructions, String selectedTime, String difficulty) {
     // check the form feils to see if the form is validated
-    if (isFormValidated(
-            recipeName, ingredients, instructions, makingTime, difficulty) ==
+    if (isFormValidated(updatedRecipeName, updatedIngredients,
+            updatedInstructions, selectedTime, difficulty) ==
         true) {
-      addRecipeToDB();
-      recipeAddedSuccesfully(context);
+      editRecipe(
+          updatedRecipeName,
+          updatedIngredients,
+          updatedInstructions,
+          selectedTime,
+          difficulty); // implement this method, should be around firestore and stuff
+      recipeAddedSuccesfully(context); // implement this method
     } else {
-      failedToAddRecipe(context);
+      failedToAddRecipe(context); // implement this method
     }
+  }
+
+  void editRecipe(updatedRecipeName, updatedIngredients, updatedInstructions,
+      selectedTime, difficulty) {
+    // Now you have the updated values, you can update the recipe object
+    widget.recipe.recipeName = updatedRecipeName;
+    widget.recipe.ingredients = updatedIngredients;
+    widget.recipe.instructions = updatedInstructions;
+    widget.recipe.makingTime = selectedTime;
+    widget.recipe.difficulty = difficulty;
+
+    // Perform any additional logic you may need, such as updating the image
+    if (_selectedImage != null) {
+      // Update the recipe's image URL
+      // Note: You may need to implement a method to upload the new image
+      //widget.recipe.imageURL = 'new_image_url_here';
+    }
+
+    // Now, you can save the updated recipe back to Firestore or wherever you store your recipes
+    // Example: Firestore update code
+    FirebaseFirestore.instance
+        .collection('recipes')
+        .doc(widget.recipe.id!)
+        .update({
+      'difficulty': difficulty,
+      'imageURL': widget.recipe.imageURL, // Update with the new image URL
+      'ingredients': updatedIngredients,
+      'instructions': updatedInstructions,
+      'makingTime': selectedTime,
+      'name': updatedRecipeName,
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers here in initState
+    recipeNameController =
+        TextEditingController(text: widget.recipe.recipeName);
+    ingredientsController =
+        TextEditingController(text: widget.recipe.ingredients);
+    instructionsController =
+        TextEditingController(text: widget.recipe.instructions);
   }
 
   @override
@@ -248,7 +224,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
               children: [
                 Center(
                   child: Text(
-                    'Add a Recipe!',
+                    'Edit a Recipe',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -291,7 +267,8 @@ class _AddRecipePageState extends State<AddRecipePage> {
                   maxLines: null,
                   style: TextStyle(fontSize: 16),
                   decoration: InputDecoration(
-                    hintText: 'Making instructions - try being clear and consice!',
+                    hintText:
+                        'Making instructions - try being clear and consice!',
                     contentPadding: EdgeInsets.all(10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -303,7 +280,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                 Text('Making Time'),
                 MakingTimePicker(
-                  initialValue: 'Not Specified',
+                  initialValue: widget.recipe.makingTime,
                   onTimeSelected: (time) {
                     handleTimeSelection(time);
                   },
@@ -312,7 +289,7 @@ class _AddRecipePageState extends State<AddRecipePage> {
 
                 Text('Difficulty'),
                 DifficultyDropdown(
-                  initialValue: 'Not Specified',
+                  initialValue: widget.recipe.difficulty,
                   onDifficultySelected: (difficulty) {
                     handleDifficultySelection(difficulty);
                   },
@@ -358,16 +335,16 @@ class _AddRecipePageState extends State<AddRecipePage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: MyButton(
-                    buttonText: 'Finish',
+                    buttonText: 'Save Changes',
                     onTap: () {
-                      addRecipe(
+                      finishEditRecipe(
                         recipeNameController.text,
                         ingredientsController.text,
                         instructionsController.text,
                         selectedTime,
                         difficulty,
                       );
-                      widget.onRecipeAdded();
+                      //widget.onRecipeEdited();
                     },
                   ),
                 ),

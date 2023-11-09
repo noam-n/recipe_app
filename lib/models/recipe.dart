@@ -3,12 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Recipe {
   final String? id;
   final String userId;
-  final String recipeName;
-  final String makingTime;
-  final String difficulty;
-  final String ingredients;
-  final String instructions;
-  final String imageURL;
+   String recipeName;
+   String makingTime;
+   String difficulty;
+   String ingredients;
+   String instructions;
+   String imageURL;
 
   Recipe({
     this.id,
