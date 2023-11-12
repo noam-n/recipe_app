@@ -5,14 +5,16 @@ final _db = FirebaseFirestore.instance;
 
 // Fetch specific Recipe by recipe name
 Future<Recipe> getRecipe(String name) async {
-  final snapshot = await _db.collection('recipes').where('name', isEqualTo: name).get();
+  final snapshot =
+      await _db.collection('recipes').where('name', isEqualTo: name).get();
   final recipeData = snapshot.docs.map((e) => Recipe.fromSnapshot(e)).single;
   return recipeData;
 }
 
 // Fetch All Recipes for a given user
 Future<List<Recipe>> getUserRecipes(String userId) async {
-  final snapshot = await _db.collection('recipes').where('userId', isEqualTo: userId).get();
+  final snapshot =
+      await _db.collection('recipes').where('userId', isEqualTo: userId).get();
   final recipeData = snapshot.docs.map((e) => Recipe.fromSnapshot(e)).toList();
   return recipeData;
 }
@@ -23,3 +25,14 @@ Future<List<Recipe>> getAllRecipes() async {
   final recipeData = snapshot.docs.map((e) => Recipe.fromSnapshot(e)).toList();
   return recipeData;
 }
+
+// Fetch all recipes not uploaded by the current user
+Future<List<Recipe>> getNonUserRecipes(String currentUserId) async {
+  final snapshot = await _db.collection('recipes').get();
+  final recipeData = snapshot.docs
+      .where((doc) => doc['userId'] != null && doc['userId'] != currentUserId) // filter out recipes with missing userId
+      .map((e) => Recipe.fromSnapshot(e))
+      .toList();
+  return recipeData;
+}
+

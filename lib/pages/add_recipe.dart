@@ -2,7 +2,6 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:recipe_app/components/textFeild.dart';
 import 'package:recipe_app/components/button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -33,9 +32,9 @@ class _AddRecipePageState extends State<AddRecipePage> {
     });
   }
 
-  void handleDifficultySelection(String _difficulty) {
+  void handleDifficultySelection(String difficulty) {
     setState(() {
-      difficulty = _difficulty;
+      this.difficulty = difficulty;
     });
   }
 
