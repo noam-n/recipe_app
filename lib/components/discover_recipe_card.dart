@@ -1,41 +1,21 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, use_key_in_widget_constructors, avoid_init_to_null
+// ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, use_key_in_widget_constructors, file_names
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/models/recipe.dart';
 
 import '../pages/edit_recipe.dart';
 
-class RecipeCard extends StatefulWidget {
+class DiscoverRecipeCard extends StatefulWidget {
   final Recipe recipe;
   final List<Recipe> recipeList; // This is the list of recipes
-  final Function(Recipe)? onDelete; // Define the callback
 
-  RecipeCard(
-      {required this.recipe, required this.recipeList, this.onDelete = null});
+  DiscoverRecipeCard({required this.recipe, required this.recipeList});
 
   @override
-  State<RecipeCard> createState() => _RecipeCardState();
+  State<DiscoverRecipeCard> createState() => _DiscoverRecipeCardState();
 }
 
-class _RecipeCardState extends State<RecipeCard> {
-  void deleteRecipe(String recipeId) {
-    final collectionRef = FirebaseFirestore.instance.collection('recipes');
-
-    // Delete the recipe document from the collection
-
-    collectionRef.doc(recipeId).delete().then((value) {
-      // Remove the deleted recipe from the list
-      if (widget.onDelete != null) {
-        widget.onDelete!(
-            widget.recipe); // Call the callback to update the list in HomePage
-      }
-    }).catchError((error) {
-      // Handle any potential error during deletion
-      print('Error deleting recipe: $error');
-    });
-  }
-
+class _DiscoverRecipeCardState extends State<DiscoverRecipeCard> {
   Widget? recipeImage() {
     if (widget.recipe.imageURL.isNotEmpty && widget.recipe.imageURL != 'null') {
       return Image.network(
@@ -56,37 +36,6 @@ class _RecipeCardState extends State<RecipeCard> {
     } // Handle the case when imageURL is empty or null
   }
 
-  void deleteRecipeConfirmation(BuildContext context, String recipeId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Delete Recipe'),
-          content: Text(
-              'Are you sure you want to delete ${widget.recipe.recipeName}?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            TextButton(
-              child: Text(
-                'Delete',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                deleteRecipe(recipeId); // Call the deleteRecipe method
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -99,9 +48,6 @@ class _RecipeCardState extends State<RecipeCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Display the recipe image if available
-          //recipeImage()!,
-
           // First section: Left to Mid (Recipe Name, Making Time, Difficulty)
           Container(
             padding: EdgeInsets.all(16),
@@ -143,22 +89,11 @@ class _RecipeCardState extends State<RecipeCard> {
               ),
               // Delete button
               IconButton(
-                color: Colors.redAccent,
-                icon: Icon(Icons.delete),
+                color: Colors.grey,
+                icon: Icon(Icons.favorite),
                 onPressed: () {
                   // Call the deleteRecipe method to remove the recipe from Firestore
-                  deleteRecipeConfirmation(context, widget.recipe.id!);
                 },
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  color: Colors.grey,
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    navigateToEditPage(context, widget.recipe);
-                  },
-                ),
               ),
             ],
           ),

@@ -1,53 +1,25 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors
 
-//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:recipe_app/models/recipe.dart';
-import 'package:recipe_app/models/recipe_repository.dart';
-import 'package:recipe_app/pages/discover_page.dart';
+import 'package:recipe_app/pages/recipe_details.dart';
 import '../components/bottom_navbar.dart';
+import '../components/discover_recipe_card.dart';
 import '../components/my_AppBar.dart';
-import '../components/recipe_card.dart';
-import 'add_recipe.dart';
-import 'recipe_details.dart';
+import '../models/recipe.dart';
+import '../models/recipe_repository.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class DiscoverPage extends StatefulWidget {
+  const DiscoverPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<DiscoverPage> createState() => _DiscoverPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  var user = FirebaseAuth.instance.currentUser!;
-  var displayName = "Guest";
+class _DiscoverPageState extends State<DiscoverPage> {
   List<Recipe> recipes = [];
   String searchQuery = '';
-  bool isNeedSearchfeild = true;
-
-  void navigateToDiscover(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return DiscoverPage();
-        },
-      ),
-    );
-  }
-
-  void navigateToHome(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return HomePage();
-        },
-      ),
-    );
-  }
+  var user = FirebaseAuth.instance.currentUser!;
 
   void updateSearchQuery(String query) {
     setState(() {
@@ -61,55 +33,6 @@ class _HomePageState extends State<HomePage> {
           .toLowerCase()
           .contains(searchQuery.toLowerCase());
     }).toList();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getDisplayName();
-    _fetchUserRecipes(user.uid);
-  }
-
-  // Method to fetch user recipes and update the 'recipes' list
-  Future<void> _fetchUserRecipes(String userId) async {
-    final userRecipes = await getUserRecipes(userId);
-    setState(() {
-      recipes = userRecipes;
-    });
-  }
-
-  String getDisplayName() {
-    if (user.displayName != null) {
-      setState(() {
-        displayName = user.displayName ??
-            "Guest"; // Update displayName and trigger a rebuild
-      });
-    }
-    return displayName;
-  }
-
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
-  void navigateToAddRecipePage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) {
-          return AddRecipePage(onRecipeAdded: () {
-            //callback function to fetch user recipes after new recipe was added
-            _fetchUserRecipes(user.uid);
-          });
-        },
-      ),
-    );
-  }
-
-  void deleteRecipeFromList(Recipe recipe) {
-    setState(() {
-      recipes.remove(recipe);
-    });
   }
 
   Widget showAllRecipes() {
@@ -131,10 +54,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               },
-              child: RecipeCard(
+              child: DiscoverRecipeCard(
                 recipe: recipe,
                 recipeList: recipes,
-                onDelete: deleteRecipeFromList, // Pass the callback function
               ),
             );
           },
@@ -160,14 +82,13 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => RecipeDetailsPage(
-                        recipe: recipe, isNeedSearchfeild: isNeedSearchfeild),
+                        recipe: recipe, isNeedSearchfeild: true),
                   ),
                 );
               },
-              child: RecipeCard(
+              child: DiscoverRecipeCard(
                 recipe: recipe,
                 recipeList: filteredRecipes,
-                onDelete: deleteRecipeFromList,
               ),
             );
           },
@@ -180,6 +101,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // Method to fetch user recipes and update the 'recipes' list
+  Future<void> _fetchUserRecipes(String userId) async {
+    final nonUserRecipes = await getNonUserRecipes(userId);
+    setState(() {
+      recipes = nonUserRecipes;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserRecipes(user.uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     final filteredRecipes =
@@ -187,16 +122,17 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: MyAppBar(
-          onSearchChanged: updateSearchQuery,
-          isNeedSearchfeild: isNeedSearchfeild,
-          isHomepage: true),
+        isNeedSearchfeild: true,
+        onSearchChanged: updateSearchQuery,
+        isHomepage: false,
+      ),
       body: Column(
         children: [
           SizedBox(height: 25),
           Align(
             alignment: Alignment.center,
             child: Text(
-              "My Recipes",
+              "Discover new tastes..",
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
           ),
@@ -206,11 +142,6 @@ class _HomePageState extends State<HomePage> {
           else
             showFilteredRecipes(filteredRecipes),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        onPressed: () => navigateToAddRecipePage(context),
-        child: Icon(Icons.add),
       ),
       bottomNavigationBar: MyBottomNavbar(isRecipeDetailsPage: false),
     );

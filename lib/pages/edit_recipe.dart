@@ -52,9 +52,9 @@ class _EditRecipeState extends State<EditRecipe> {
     });
   }
 
-  void handleDifficultySelection(String _difficulty) {
+  void handleDifficultySelection(String difficulty) {
     setState(() {
-      difficulty = _difficulty;
+      this.difficulty = difficulty;
     });
   }
 

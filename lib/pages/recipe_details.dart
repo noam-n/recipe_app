@@ -27,7 +27,9 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: MyAppBar(
-          onSearchChanged: updateSearchQuery, isNeedSearchfeild: false),
+          onSearchChanged: updateSearchQuery,
+          isNeedSearchfeild: false,
+          isHomepage: false),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

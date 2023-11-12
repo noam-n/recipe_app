@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../pages/explore_page.dart';
+import '../pages/discover_page.dart';
 import '../pages/home_page.dart';
 
 class MyBottomNavbar extends StatelessWidget {
@@ -10,12 +10,12 @@ class MyBottomNavbar extends StatelessWidget {
 
   const MyBottomNavbar({super.key, required this.isRecipeDetailsPage});
 
-  void navigateToExplore(BuildContext context) {
+  void navigateToDiscover(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {
-          return ExplorePage();
+          return DiscoverPage();
         },
       ),
     );
@@ -42,7 +42,7 @@ class MyBottomNavbar extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
-            label: 'Explore',
+            label: 'Discover',
           ),
         ],
         selectedItemColor: isRecipeDetailsPage? Colors.grey : Colors.white,
@@ -53,7 +53,7 @@ class MyBottomNavbar extends StatelessWidget {
             navigateToHome(context);
           }
           if (index == 1) {
-            navigateToExplore(context);
+            navigateToDiscover(context);
           }
         });
   }
