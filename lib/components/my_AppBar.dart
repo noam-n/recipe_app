@@ -60,8 +60,9 @@ class _MyAppBarState extends State<MyAppBar> {
                   child: Container(
                     margin: EdgeInsets.only(right: 20), // Add right margin
                     child: SizedBox(
-                      width: 200, // Set a width to limit the search bar
+                      width: 120, // Set a width to limit the search bar
                       child: TextField(
+                        style: TextStyle(fontSize: 14),
                         onChanged: widget.onSearchChanged, //updateSearchQuery,
                         decoration: InputDecoration(
                           hintText: 'Search recipes...',
@@ -89,11 +90,11 @@ class _MyAppBarState extends State<MyAppBar> {
                   ),
                 ),
               ),
-              if(widget.isHomepage)
-              IconButton(
-                onPressed: signUserOut,
-                icon: Icon(Icons.logout),
-              ),
+              if (widget.isHomepage)
+                IconButton(
+                  onPressed: signUserOut,
+                  icon: Icon(Icons.logout),
+                ),
             ],
           ),
         ),
