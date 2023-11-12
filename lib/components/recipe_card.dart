@@ -117,10 +117,18 @@ class _RecipeCardState extends State<RecipeCard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.watch_later),
-                    Text(' ${widget.recipe.makingTime}'),
+                    Flexible(
+                      child: Text(
+                        ' ${widget.recipe.makingTime}',
+                      ),
+                    ),
                     SizedBox(width: 25),
                     Icon(Icons.hardware),
-                    Text(' ${widget.recipe.difficulty}'),
+                    Flexible(
+                      child: Text(
+                        ' ${widget.recipe.difficulty}',
+                      ),
+                    ),
                   ],
                 ),
               ],
