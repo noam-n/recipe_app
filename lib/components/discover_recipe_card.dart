@@ -1,21 +1,28 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_constructors_in_immutables, use_key_in_widget_constructors, file_names
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recipe_app/models/recipe.dart';
 
+import '../models/recipe_repository.dart';
 import '../pages/edit_recipe.dart';
 
 class DiscoverRecipeCard extends StatefulWidget {
   final Recipe recipe;
   final List<Recipe> recipeList; // This is the list of recipes
+    final Function(Recipe)? onDelete; // Define the callback
 
-  DiscoverRecipeCard({required this.recipe, required this.recipeList});
+  final User? user = FirebaseAuth.instance.currentUser;
+
+  DiscoverRecipeCard({required this.recipe, required this.recipeList, this.onDelete = null});
 
   @override
   State<DiscoverRecipeCard> createState() => _DiscoverRecipeCardState();
 }
 
 class _DiscoverRecipeCardState extends State<DiscoverRecipeCard> {
+  bool isLiked = false;
+
   Widget? recipeImage() {
     if (widget.recipe.imageURL.isNotEmpty && widget.recipe.imageURL != 'null') {
       return Image.network(
@@ -34,6 +41,25 @@ class _DiscoverRecipeCardState extends State<DiscoverRecipeCard> {
         child: Text('No Image Available'),
       );
     } // Handle the case when imageURL is empty or null
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Call a method to check if the recipe is liked and update isLiked
+    checkIfRecipeIsLiked();
+  }
+
+  Future<void> checkIfRecipeIsLiked() async {
+    if (widget.user != null && widget.recipe.id != null) {
+      // Fetch the user's favorites
+      final userFavorites = await getUserFavorites(widget.user!.uid);
+
+      // Check if the recipe is in favorites
+      setState(() {
+        isLiked = userFavorites.contains(widget.recipe.id);
+      });
+    }
   }
 
   @override
@@ -89,10 +115,36 @@ class _DiscoverRecipeCardState extends State<DiscoverRecipeCard> {
               ),
               // Delete button
               IconButton(
-                color: Colors.grey,
+                color: isLiked ? Colors.red : Colors.grey,
                 icon: Icon(Icons.favorite),
-                onPressed: () {
-                  // Call the deleteRecipe method to remove the recipe from Firestore
+                onPressed: () async {
+                  // Fetch the user's favorites
+                  final userFavorites =
+                      await getUserFavorites(widget.user!.uid);
+
+                  // Check if the recipe is in favorites
+                  bool isRecipeLiked = userFavorites.contains(widget.recipe.id);
+
+                  // If liked, remove from favorites. If not liked, add to favorites.
+                  if (widget.recipe.id != null) {
+                    // Check if the recipe is already liked
+                    if (isRecipeLiked) {
+                      // If liked, remove from favorites
+                      removeRecipeFromFavorites(
+                          widget.user!.uid, widget.recipe.id);
+                      // Update isLiked state after successfully removing from favorites
+                      setState(() {
+                        isLiked = false;
+                      });
+                    } else {
+                      // If not liked, add to favorites
+                      addRecipeToFavorites(widget.user!.uid, widget.recipe.id);
+                      // Update isLiked state after successfully adding to favorites
+                      setState(() {
+                        isLiked = true;
+                      });
+                    }
+                  }
                 },
               ),
             ],
