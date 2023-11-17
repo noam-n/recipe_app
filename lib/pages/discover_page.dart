@@ -16,6 +16,7 @@ class DiscoverPage extends StatefulWidget {
   State<DiscoverPage> createState() => _DiscoverPageState();
 }
 
+  
 class _DiscoverPageState extends State<DiscoverPage> {
   List<Recipe> recipes = [];
   String searchQuery = '';
