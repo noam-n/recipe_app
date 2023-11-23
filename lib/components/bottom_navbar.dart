@@ -47,6 +47,19 @@ class MyBottomNavbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get the current route
+    final route = ModalRoute.of(context);
+
+    // Determine the selected index based on the route type
+    int selectedIndex = 0; // Default to Home
+    if (route is MaterialPageRoute) {
+      if (route.builder(context) is FavoritesPage) {
+        selectedIndex = 2;
+      } else if (route.builder(context) is DiscoverPage) {
+        selectedIndex = 1;
+      }
+    }
+
     return BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -62,10 +75,10 @@ class MyBottomNavbar extends StatelessWidget {
             label: 'Favorites',
           ),
         ],
-        selectedItemColor: isRecipeDetailsPage ? Colors.grey : Colors.white,
-        unselectedItemColor:
-            Colors.grey, // Set color based on the current page,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
         backgroundColor: Colors.black,
+        currentIndex: selectedIndex,
         onTap: (int index) {
           if (index == 0) {
             navigateToHome(context);
